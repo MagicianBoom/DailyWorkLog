@@ -9,6 +9,7 @@ Generate Works dialog box.
 
 ## Usage
 (1) Your linux needs to support Zenity.
+
 (2) Creating timed works via crontab.
 
 ## Example
