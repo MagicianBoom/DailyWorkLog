@@ -1,28 +1,39 @@
 #!/bin/bash
 
-DATE_SUFFIX=$(date "+%Y%m")
 LOG_FILENAME="work_log.txt"
-NEW_LOG_FILENAME="${LOG_FILENAME%.*}_${DATE_SUFFIX}.${LOG_FILENAME##*.}"
 
 WORK_ROOT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-WORK_LOG_FILE="$WORK_ROOT_DIR/$LOG_FILENAME"
+DAY_WORK_LOG_FILE="$WORK_ROOT_DIR/$LOG_FILENAME"
 PENDING_WORK_FILE="$WORK_ROOT_DIR/pending.data"
+TODAY_PENDING_WORK_FILE="$WORK_ROOT_DIR/today_pending.data"
 
-date=$(date "+%Y-%m-%d")
+MONTH_DATE_SUFFIX=$(date "+%Y%m")
+MONTH_LOG_FILENAME="${LOG_FILENAME%.*}_${MONTH_DATE_SUFFIX}.${LOG_FILENAME##*.}"
 
-if [ -f "$WORK_LOG_FILE" ]; then
-    echo "" >> $WORK_LOG_FILE
-    echo "========================================= $date =========================================" >> $WORK_LOG_FILE
+today_date=$(date "+%Y-%m-%d")
+tomorrow_date=$(date -d tomorrow +%Y-%m-%d)
+
+if [ -f "$DAY_WORK_LOG_FILE" ]; then
+    echo "" >> $DAY_WORK_LOG_FILE
 else
-    touch $WORK_LOG_FILE
-    echo "========================================= $date =========================================" >> $WORK_LOG_FILE
+    touch $DAY_WORK_LOG_FILE
+    echo "========================================= $date =========================================" > $DAY_WORK_LOG_FILE
+    echo "" >> $DAY_WORK_LOG_FILE
 fi
 
-if [ -f "$PENDING_WORK_FILE" ]; then
-    echo "其他" > $PENDING_WORK_FILE
+if [ -f "$WORK_ROOT_DIR/work_log/$MONTH_LOG_FILENAME" ]; then
+    cat $DAY_WORK_LOG_FILE >> $WORK_ROOT_DIR/work_log/$MONTH_LOG_FILENAME
 else
+    touch $WORK_ROOT_DIR/work_log/$MONTH_LOG_FILENAME
+    cat $DAY_WORK_LOG_FILE >> $WORK_ROOT_DIR/work_log/$MONTH_LOG_FILENAME
+fi
+
+echo "========================================= $tomorrow_date =========================================" > $DAY_WORK_LOG_FILE
+
+if [ ! -f "$PENDING_WORK_FILE" ]; then
     touch $PENDING_WORK_FILE
     echo "其他" > $PENDING_WORK_FILE
 fi
 
-cp $WORK_LOG_FILE $WORK_ROOT_DIR/work_log/$NEW_LOG_FILENAME
+cp $PENDING_WORK_FILE $TODAY_PENDING_WORK_FILE
+
